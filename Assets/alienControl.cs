@@ -9,12 +9,23 @@ public class alienControl : MonoBehaviour
     public LayerMask obstacleMask; // Máscara para detectar obstáculos
     private Rigidbody2D rb2d; // Rigidbody2D do alien
     private AlienManager manager;
+    private Rigidbody2D rb;
+
+    public GameObject bulletPrefab; // Prefab do disparo do alien
+    public Transform firePoint; // Ponto de disparo do alien
+    public float bulletSpeed = 5.0f; // Velocidade do disparo do alien
+    public float fireDelay = 2.0f; // Delay entre disparos
+    private float fireTimer = 0.0f; // Timer para controlar o delay entre disparos
     
     // Start is called before the first frame update
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>(); // Inicializa o Rigidbody2D
         
+        
+        rb = GetComponent<Rigidbody2D>();
+        rb.velocity = new Vector2(0, -bulletSpeed); // Faz o tiro se mover para baixo
+
         manager = Object.FindAnyObjectByType<AlienManager>();
         manager.aliens.Add(this);
 
@@ -34,6 +45,12 @@ public class alienControl : MonoBehaviour
         if (hit.collider != null) {
             manager.ChangeDirectionForAll();
         }
+
+        fireTimer += Time.deltaTime;
+        if (fireTimer >= fireDelay) {
+            Shoot();
+            fireTimer = 0.0f;
+        }
     }
 
     void OnDestroy()
@@ -49,5 +66,12 @@ public class alienControl : MonoBehaviour
         var vel = rb2d.velocity;
         vel.x *= -1;
         rb2d.velocity = vel;
+    }
+
+    void Shoot()
+    {
+        GameObject alienBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation); // Cria o disparo
+        Rigidbody2D rb2d = alienBullet.GetComponent<Rigidbody2D>(); // Pega o Rigidbody do disparo
+        rb2d.velocity = -firePoint.up * bulletSpeed; // Define a velocidade do disparo para baixo
     }
 }

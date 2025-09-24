@@ -7,7 +7,7 @@ public class bullet : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Destroy(gameObject, 4f); // Destrói após 4 segundos
+        //Destroy(gameObject, 4f);
 
     }
 
